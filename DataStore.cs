@@ -65,16 +65,33 @@ namespace TechStore
 
         public void UpdateDevice(Device updatedDevice)
         {
-            using (var fileStream = new FileStream(FullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+            using (var fileStream = new FileStream(FullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
             {
                 var store = GetStore(fileStream);
                 var indexOfExistingDevice = store.FindIndex(device => device.Id == updatedDevice.Id);
-                if (indexOfExistingDevice > 0)
+                if (indexOfExistingDevice >= 0)
                 {
                     store[indexOfExistingDevice] = updatedDevice;
                 }
 
                 UpdateStore(fileStream, store);
+            }
+        }
+
+        public bool DeleteDevice(int id)
+        {
+            using (var fileStream = new FileStream(FullPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            {
+                var store = GetStore(fileStream);
+                var indexOfExistingDevice = store.FindIndex(device => device.Id == id);
+                if (indexOfExistingDevice >= 0)
+                {
+                    store.RemoveAt(indexOfExistingDevice);
+                    UpdateStore(fileStream, store);
+                    return true;
+                }
+
+                return false;
             }
         }
 

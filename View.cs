@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace TechStore
 {
@@ -46,6 +48,12 @@ namespace TechStore
                 case MainMenuEnum.AddDevice:
                     AddDevice();
                     break;
+                case MainMenuEnum.EditDevice:
+                    UpdateDevice();
+                    break;
+                case MainMenuEnum.DeleteDevice:
+                    DeleteDevice();
+                    break;
 
                 case MainMenuEnum.Exit:
                     Environment.Exit(0);
@@ -76,6 +84,63 @@ namespace TechStore
 
             newBaseDevice.FillProcess();
             DataStore.SaveItem(newBaseDevice);
+            ShowCompleteMessage();
+        }
+
+        private void UpdateDevice()
+        {
+            Console.Clear();
+            Console.Write("ID: ");
+            while (true)
+            {
+                if (Int32.TryParse(Console.ReadLine(), out int id))
+                {
+                    Console.Clear();
+                    var device = DataStore.GetDevice(id);
+                    device.DeviceInfo();
+
+                    Console.WriteLine("What to change?");
+                    var propertyToChange = Console.ReadLine();
+                    if (!String.IsNullOrWhiteSpace(propertyToChange))
+                    {
+                        var existedDetail = device.TechnicalDetails.Find(detail => detail.Name.ToLower() == propertyToChange.ToLower());
+                        if (existedDetail != null)
+                        {
+                            Console.Write("Value: ");
+                            existedDetail.Value = Console.ReadLine();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Value: ");
+                            var newTechnicalDetailValue = Console.ReadLine();
+                            device.TechnicalDetails.Add(new TechnicalDetail(propertyToChange, newTechnicalDetailValue));
+                        }
+                        DataStore.UpdateDevice(device);
+                        ShowCompleteMessage();
+                        break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid ID.");
+                }
+            }
+        }
+
+        private void DeleteDevice()
+        {
+            Console.Clear();
+            Console.Write("ID:");
+            if (Int32.TryParse(Console.ReadLine(), out int id))
+            {
+                if (DataStore.DeleteDevice(id)) {
+                    ShowCompleteMessage();
+                }
+                else
+                {
+                    Console.WriteLine("Something went wrong :c");
+                };
+            }
         }
 
         private void ShowExit()
@@ -88,6 +153,12 @@ namespace TechStore
                     break;
                 }
             }
+        }
+
+        private void ShowCompleteMessage()
+        {
+            Console.WriteLine("Done!");
+            Thread.Sleep(1000);
         }
     }
 }

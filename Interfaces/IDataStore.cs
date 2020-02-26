@@ -11,5 +11,6 @@ namespace TechStore
         List<Device> GetStore(FileStream fileStream);
         Device GetDevice(int id);
         void UpdateDevice(Device updatedDevice);
+        bool DeleteDevice(int id);
     }
 }
