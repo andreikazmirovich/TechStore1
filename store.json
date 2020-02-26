@@ -1,1 +1,1 @@
-[{"ScreenSize":13.3,"OS":1,"CameraPixels":10.1,"Id":2,"Name":"Lenovo","Price":149.99},{"ProcessorName":"AMD","RamMemoryGb":3,"MemoryType":1,"ScreenSize":16.6,"Id":2,"Name":"Asus","Price":300.0}]
+[{"TechnicalDetails":[{"Name":"OS","Value":"Linux"},{"Name":"Screen size","Value":"16,6"}],"Id":1,"Name":"Asus","Price":300.0},{"TechnicalDetails":[{"Name":"OS","Value":"iOS"},{"Name":"Version","Value":"X"},{"Name":"NFC","Value":"Yes"}],"Id":2,"Name":"Iphone","Price":999.0}]

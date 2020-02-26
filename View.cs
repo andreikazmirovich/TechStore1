@@ -46,12 +46,17 @@ namespace TechStore
                 case MainMenuEnum.AddDevice:
                     AddDevice();
                     break;
+
+                case MainMenuEnum.Exit:
+                    Environment.Exit(0);
+                    break;
             }
         }
 
         private void ShowAllDevices()
         {
-            foreach (var device in DataStore.GetStore<Device>())
+            Console.Clear();
+            foreach (var device in DataStore.GetStore())
             {
                 device.DeviceInfo();
             }
@@ -67,22 +72,10 @@ namespace TechStore
             }
 
             Console.Write("Choose device: ");
-            Device newDevice = null;
-            switch ((AddMenuEnum)Convert.ToInt32(Console.ReadLine()))
-            {
-                case AddMenuEnum.Laptop:
-                    newDevice = new Laptop();
-                    break;
-                case AddMenuEnum.Smartphone:
-                    newDevice = new Smartphone();
-                    break;
-            }
+            var newBaseDevice = new Device();
 
-            if (newDevice != null)
-            {
-                newDevice.FillProcess();
-                DataStore.SaveItem(newDevice);
-            }
+            newBaseDevice.FillProcess();
+            DataStore.SaveItem(newBaseDevice);
         }
 
         private void ShowExit()
