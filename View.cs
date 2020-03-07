@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace TechStore
 {
@@ -46,12 +48,23 @@ namespace TechStore
                 case MainMenuEnum.AddDevice:
                     AddDevice();
                     break;
+                case MainMenuEnum.EditDevice:
+                    UpdateDevice();
+                    break;
+                case MainMenuEnum.DeleteDevice:
+                    DeleteDevice();
+                    break;
+
+                case MainMenuEnum.Exit:
+                    Environment.Exit(0);
+                    break;
             }
         }
 
         private void ShowAllDevices()
         {
-            foreach (var device in DataStore.GetStore<Device>())
+            Console.Clear();
+            foreach (var device in DataStore.GetStore())
             {
                 device.DeviceInfo();
             }
@@ -67,21 +80,66 @@ namespace TechStore
             }
 
             Console.Write("Choose device: ");
-            Device newDevice = null;
-            switch ((AddMenuEnum)Convert.ToInt32(Console.ReadLine()))
-            {
-                case AddMenuEnum.Laptop:
-                    newDevice = new Laptop();
-                    break;
-                case AddMenuEnum.Smartphone:
-                    newDevice = new Smartphone();
-                    break;
-            }
+            var newBaseDevice = new Device();
 
-            if (newDevice != null)
+            newBaseDevice.FillProcess();
+            DataStore.SaveItem(newBaseDevice);
+            ShowCompleteMessage();
+        }
+
+        private void UpdateDevice()
+        {
+            Console.Clear();
+            Console.Write("ID: ");
+            while (true)
             {
-                newDevice.FillProcess();
-                DataStore.SaveItem(newDevice);
+                if (Int32.TryParse(Console.ReadLine(), out int id))
+                {
+                    Console.Clear();
+                    var device = DataStore.GetDevice(id);
+                    device.DeviceInfo();
+
+                    Console.WriteLine("What to change?");
+                    var propertyToChange = Console.ReadLine();
+                    if (!String.IsNullOrWhiteSpace(propertyToChange))
+                    {
+                        var existedDetail = device.TechnicalDetails.Find(detail => detail.Name.ToLower() == propertyToChange.ToLower());
+                        if (existedDetail != null)
+                        {
+                            Console.Write("Value: ");
+                            existedDetail.Value = Console.ReadLine();
+                        }
+                        else
+                        {
+                            Console.WriteLine("Value: ");
+                            var newTechnicalDetailValue = Console.ReadLine();
+                            device.TechnicalDetails.Add(new TechnicalDetail(propertyToChange, newTechnicalDetailValue));
+                        }
+                        DataStore.UpdateDevice(device);
+                        ShowCompleteMessage();
+                        break;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Invalid ID.");
+                }
+            }
+        }
+
+        private void DeleteDevice()
+        {
+            Console.Clear();
+            Console.Write("ID:");
+            if (Int32.TryParse(Console.ReadLine(), out int id))
+            {
+                if (DataStore.DeleteDevice(id)) {
+                    ShowCompleteMessage();
+                }
+                else
+                {
+                    Console.WriteLine("Something went wrong :c");
+                };
             }
         }
 
@@ -95,6 +153,12 @@ namespace TechStore
                     break;
                 }
             }
+        }
+
+        private void ShowCompleteMessage()
+        {
+            Console.WriteLine("Done!");
+            Thread.Sleep(1000);
         }
     }
 }
